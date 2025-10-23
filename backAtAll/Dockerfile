@@ -18,7 +18,10 @@ RUN ./gradlew --version
 # Copiamos el resto y construimos el jar
 COPY . .
 RUN dos2unix gradlew && chmod +x gradlew
-RUN ./gradlew --no-daemon bootJar -x test
+# Limita memoria de Gradle y muestra logs detallados
+ENV GRADLE_OPTS="-Xmx256m -Dfile.encoding=UTF-8"
+RUN ./gradlew --no-daemon --stacktrace --info bootJar -x test
+
 
 # ===== Etapa 2: runtime =====
 FROM eclipse-temurin:17-jre
