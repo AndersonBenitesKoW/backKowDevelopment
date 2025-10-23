@@ -18,8 +18,16 @@ public class ClienteController {
 
     @GetMapping
     public ResponseEntity<List<Cliente>> getAllClientes() throws ExecutionException, InterruptedException {
-        List<Cliente> clientes = clienteService.getAllClientes();
-        return ResponseEntity.ok(clientes);
+        System.out.println("DEBUG: Iniciando getAllClientes");
+        try {
+            List<Cliente> clientes = clienteService.getAllClientes();
+            System.out.println("DEBUG: Clientes obtenidos: " + clientes.size());
+            return ResponseEntity.ok(clientes);
+        } catch (Exception e) {
+            System.err.println("DEBUG: Error en getAllClientes: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @GetMapping("/{id}")

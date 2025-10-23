@@ -22,12 +22,18 @@ public class FirebaseConfig {
 
     @Bean
     public Firestore firestore() throws Exception {
+        System.out.println("DEBUG: Inicializando Firebase");
         if (FirebaseApp.getApps().isEmpty()) {
+            System.out.println("DEBUG: No hay apps Firebase, inicializando");
             InputStream credsStream = loadCreds();
+            System.out.println("DEBUG: Credenciales cargadas: " + (credsStream != null));
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(credsStream))
                     .build();
             FirebaseApp.initializeApp(options);
+            System.out.println("DEBUG: Firebase inicializado");
+        } else {
+            System.out.println("DEBUG: Firebase ya inicializado");
         }
         return FirestoreClient.getFirestore();
     }

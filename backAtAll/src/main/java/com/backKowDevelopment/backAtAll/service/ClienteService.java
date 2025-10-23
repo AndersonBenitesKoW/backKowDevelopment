@@ -16,15 +16,20 @@ public class ClienteService {
     private static final String COLLECTION_NAME = "clientes";
 
     public List<Cliente> getAllClientes() throws ExecutionException, InterruptedException {
+        System.out.println("DEBUG: Iniciando consulta a Firestore para clientes");
         Firestore db = FirestoreClient.getFirestore();
+        System.out.println("DEBUG: Firestore obtenido: " + db);
         ApiFuture<QuerySnapshot> future = db.collection(COLLECTION_NAME).get();
+        System.out.println("DEBUG: Consulta enviada, esperando respuesta");
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        System.out.println("DEBUG: Documentos obtenidos: " + documents.size());
         List<Cliente> clientes = new ArrayList<>();
         for (QueryDocumentSnapshot document : documents) {
             Cliente cliente = document.toObject(Cliente.class);
             cliente.setId(document.getId());
             clientes.add(cliente);
         }
+        System.out.println("DEBUG: Clientes procesados: " + clientes.size());
         return clientes;
     }
 
