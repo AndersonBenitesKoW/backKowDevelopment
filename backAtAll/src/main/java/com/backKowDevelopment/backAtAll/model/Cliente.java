@@ -1,5 +1,6 @@
 package com.backKowDevelopment.backAtAll.model;
 
+import com.google.cloud.firestore.annotation.ServerTimestamp;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ public class Cliente {
     private String documentoIdentidad;
     private String email;
     private String telefono;
+    @ServerTimestamp
     private Date createdAt;
     private Direccion direccion;
 }
