@@ -1,0 +1,13 @@
+.build/
+.gradle/
+build/
+target/
+out/
+.git/
+.gitignore
+*.iml
+*.log
+node_modules/
+docker-compose.yml
+*.env
+firebase-service-account.json
