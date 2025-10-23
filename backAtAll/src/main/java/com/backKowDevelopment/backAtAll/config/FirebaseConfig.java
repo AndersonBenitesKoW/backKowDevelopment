@@ -8,30 +8,48 @@ import com.google.cloud.firestore.Firestore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 @Configuration
-@Profile("!test") // No cargar Firebase en pruebas
+@Profile("!test")
 public class FirebaseConfig {
 
     @Bean
     public Firestore firestore() throws Exception {
-        // 1) Intentar ADC (Cloud Run usa la service account del servicio)
-        var credentials = GoogleCredentials.getApplicationDefault();
-
-        // 2) Si quieres fallback local (opcional):
-        String keyPath = System.getenv("FIREBASE_SERVICE_ACCOUNT_KEY_PATH");
         if (FirebaseApp.getApps().isEmpty()) {
+            InputStream credsStream = loadCreds();
             FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(credentials)
+                    .setCredentials(GoogleCredentials.fromStream(credsStream))
                     .build();
             FirebaseApp.initializeApp(options);
         }
         return FirestoreClient.getFirestore();
     }
+
+    private InputStream loadCreds() throws IOException {
+        // 1) ENV con JSON completo
+        String rawJson = System.getenv("FIREBASE_SERVICE_ACCOUNT_JSON");
+        if (rawJson != null && !rawJson.isBlank()) {
+            return new ByteArrayInputStream(rawJson.getBytes(StandardCharsets.UTF_8));
+        }
+
+        // 2) ENV con ruta a archivo
+        String keyPath = System.getenv("FIREBASE_SERVICE_ACCOUNT_KEY_PATH"); // <-- este nombre usa tu código
+        if (keyPath != null && !keyPath.isBlank()) {
+            return new FileInputStream(keyPath);
+        }
+
+        // 3) Fallback a resources
+        return new ClassPathResource("firebase-service-account.json").getInputStream();
+    }
 }
+
 
 
 /*
