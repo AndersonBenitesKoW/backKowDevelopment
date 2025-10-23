@@ -1,5 +1,6 @@
 package com.backKowDevelopment.backAtAll.model;
 
+import com.google.cloud.firestore.annotation.ServerTimestamp;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import java.util.Date;
 public class Categoria {
     private String id;
     private boolean activo;
+    @ServerTimestamp
     private Date createdAt;
     private String descripcion;
     private String nombre;
