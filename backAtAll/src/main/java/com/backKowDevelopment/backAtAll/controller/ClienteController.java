@@ -3,10 +3,12 @@ package com.backKowDevelopment.backAtAll.controller;
 import com.backKowDevelopment.backAtAll.model.Cliente;
 import com.backKowDevelopment.backAtAll.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -39,11 +41,12 @@ public class ClienteController {
             return ResponseEntity.notFound().build();
         }
     }
-
     @PostMapping
-    public ResponseEntity<String> createCliente(@RequestBody Cliente cliente) throws ExecutionException, InterruptedException {
+    public ResponseEntity<Cliente> createCliente(@RequestBody Cliente cliente)
+            throws ExecutionException, InterruptedException {
         String id = clienteService.createCliente(cliente);
-        return ResponseEntity.ok(id);
+        Cliente creado = clienteService.getClienteById(id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
     @PutMapping("/{id}")
@@ -57,4 +60,14 @@ public class ClienteController {
         clienteService.deleteCliente(id);
         return ResponseEntity.ok().build();
     }
+    // ClienteController.java
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> patchCliente(
+            @PathVariable String id,
+            @RequestBody Map<String, Object> updates
+    ) throws Exception {
+        clienteService.updatePartialCliente(id, updates);
+        return ResponseEntity.ok().build();
+    }
+
 }

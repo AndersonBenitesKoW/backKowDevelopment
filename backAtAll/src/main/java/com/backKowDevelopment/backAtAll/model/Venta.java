@@ -1,5 +1,6 @@
 package com.backKowDevelopment.backAtAll.model;
 
+import com.google.cloud.firestore.annotation.ServerTimestamp;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import java.util.List;
 public class Venta {
     private String id;
     private String clienteId;
+    @ServerTimestamp
     private Date createdAt;
     private String numero;
     private String pedidoId;

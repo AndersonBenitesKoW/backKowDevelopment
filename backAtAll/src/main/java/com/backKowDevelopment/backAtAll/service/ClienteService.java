@@ -1,6 +1,7 @@
 package com.backKowDevelopment.backAtAll.service;
 
 import com.backKowDevelopment.backAtAll.model.Cliente;
+import com.backKowDevelopment.backAtAll.model.Direccion;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -16,23 +18,44 @@ public class ClienteService {
     private static final String COLLECTION_NAME = "clientes";
 
     public List<Cliente> getAllClientes() throws ExecutionException, InterruptedException {
-        System.out.println("DEBUG: Iniciando consulta a Firestore para clientes");
         Firestore db = FirestoreClient.getFirestore();
-        System.out.println("DEBUG: Firestore obtenido: " + db);
-        ApiFuture<QuerySnapshot> future = db.collection(COLLECTION_NAME).get();
+        List<QueryDocumentSnapshot> docs = db.collection(COLLECTION_NAME).get().get().getDocuments();
 
-        System.out.println("DEBUG: Consulta enviada, esperando respuesta");
-        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-        System.out.println("DEBUG: Documentos obtenidos: " + documents.size());
         List<Cliente> clientes = new ArrayList<>();
-        for (QueryDocumentSnapshot document : documents) {
-            Cliente cliente = document.toObject(Cliente.class);
-            cliente.setId(document.getId());
-            clientes.add(cliente);
+        for (QueryDocumentSnapshot d : docs) {
+            try {
+                Cliente c = new Cliente();
+                c.setId(d.getId());
+                c.setApellidos(d.getString("apellidos"));
+                c.setNombres(d.getString("nombres"));
+                c.setEmpresa(d.getString("empresa"));
+                c.setDocumentoIdentidad(d.getString("documentoIdentidad"));
+                c.setEmail(d.getString("email"));
+                Object tel = d.get("telefono");
+                c.setTelefono(tel == null ? null : String.valueOf(tel));
+                c.setCreatedAt(d.getDate("createdAt"));
+
+                Map<String, Object> dir = (Map<String, Object>) d.get("direccion");
+                if (dir != null) {
+                    Direccion dd = new Direccion(
+                            (String) dir.get("ciudad"),
+                            (String) dir.get("distrito"),
+                            (String) dir.get("linea"),
+                            (String) dir.get("pais")
+                    );
+                    c.setDireccion(dd);
+                }
+
+                clientes.add(c);
+            } catch (Exception ex) {
+                System.err.println("ERROR mapeando doc " + d.getId() + ": " + ex.getMessage());
+                ex.printStackTrace();
+                // opcional: seguir sin reventar todo
+            }
         }
-        System.out.println("DEBUG: Clientes procesados: " + clientes.size());
         return clientes;
     }
+
 
     public Cliente getClienteById(String id) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
@@ -65,4 +88,12 @@ public class ClienteService {
         ApiFuture<WriteResult> future = db.collection(COLLECTION_NAME).document(id).delete();
         future.get();
     }
+
+    // ClienteService.java
+    public void updatePartialCliente(String id, Map<String, Object> updates) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+        // esto hace update parcial (no borra lo que no mandas)
+        db.collection("clientes").document(id).update(updates).get();
+    }
+
 }

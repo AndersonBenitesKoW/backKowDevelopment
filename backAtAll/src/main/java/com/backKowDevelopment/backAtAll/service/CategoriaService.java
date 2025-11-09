@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -59,4 +60,37 @@ public class CategoriaService {
         ApiFuture<WriteResult> future = db.collection(COLLECTION_NAME).document(id).delete();
         future.get();
     }
+    public void updatePartialCategoria(String id, Map<String, Object> updates) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+
+        // Seguridad: nunca permitir sobrescribir estos campos
+        updates.remove("id");
+        updates.remove("createdAt");
+
+        // Si viene nombre, opcional: recalcular slug
+        if (updates.containsKey("nombre")) {
+            Object nombre = updates.get("nombre");
+            if (nombre instanceof String s && !s.isBlank()) {
+                updates.put("slug", toSlug(s));
+            }
+        }
+
+        // Update parcial (no borra campos no enviados)
+        db.collection(COLLECTION_NAME)
+                .document(id)
+                .update(updates)    // también acepta dot notation para anidados
+                .get();
+    }
+
+    // helper opcional
+    private String toSlug(String s) {
+        String slug = java.text.Normalizer.normalize(s, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .toLowerCase()
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("(^-|-$)", "");
+        return slug;
+    }
+
+
 }

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -49,4 +50,15 @@ public class CategoriaController {
         categoriaService.deleteCategoria(id);
         return ResponseEntity.ok().build();
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> patchCategoria(
+            @PathVariable String id,
+            @RequestBody Map<String, Object> updates
+    ) throws Exception {
+        categoriaService.updatePartialCategoria(id, updates);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

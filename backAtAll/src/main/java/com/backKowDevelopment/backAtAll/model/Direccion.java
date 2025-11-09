@@ -8,8 +8,8 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Direccion {
-    private String pais;
     private String ciudad;
     private String distrito;
-    private String linea;
+    private String linea;  // ej. "José Crespo Y Castillo 1008..."
+    private String pais;
 }
