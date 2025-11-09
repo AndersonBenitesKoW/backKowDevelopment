@@ -10,17 +10,14 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                // Si NO envías cookies/sesión, puedes usar allowedOrigins.
-                // Si en algún momento usas cookies (withCredentials), usa allowedOriginPatterns y allowCredentials(true)
                 .allowedOrigins(
                         "http://localhost:4200",
-                        "https://backkowdevelopment.onrender.com"
+                        "https://kowdevelopment.netlify.app" // ← tu FE en producción
                 )
-                // Añade PATCH y HEAD por si los usas ahora o más adelante
-                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD")
+                .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS","HEAD")
                 .allowedHeaders("*")
-                .exposedHeaders("Location", "Content-Disposition")
-                .allowCredentials(false)   // cámbialo a true solo si enviarás cookies/sesión desde el front
+                .exposedHeaders("Location","Content-Disposition")
+                .allowCredentials(false)
                 .maxAge(3600);
     }
 }
