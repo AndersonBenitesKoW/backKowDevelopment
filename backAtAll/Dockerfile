@@ -18,6 +18,8 @@ RUN ./gradlew --version
 # Copiamos el resto y construimos el jar
 COPY . .
 RUN dos2unix gradlew && chmod +x gradlew
+# Convierte line endings de archivos Java a LF para evitar errores de compilación
+RUN find src -name "*.java" -exec dos2unix {} \;
 # Limita memoria de Gradle y muestra logs detallados
 ENV GRADLE_OPTS="-Xmx256m -Dfile.encoding=UTF-8"
 RUN ./gradlew --no-daemon --stacktrace --info bootJar -x test
