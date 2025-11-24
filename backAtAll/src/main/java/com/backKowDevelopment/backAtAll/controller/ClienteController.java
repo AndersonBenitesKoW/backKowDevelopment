@@ -71,8 +71,8 @@ public class ClienteController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Cliente> getClienteByDocumento(@RequestParam String documento) throws ExecutionException, InterruptedException {
-        Cliente cliente = clienteService.getClienteByDocumentoIdentidad(documento);
+    public ResponseEntity<Cliente> getClienteByDocumentoIdentidad(@RequestParam("documentoIdentidad") String documentoIdentidad) throws ExecutionException, InterruptedException {
+        Cliente cliente = clienteService.getClienteByDocumentoIdentidad(documentoIdentidad);
         if (cliente != null) {
             return ResponseEntity.ok(cliente);
         } else {
