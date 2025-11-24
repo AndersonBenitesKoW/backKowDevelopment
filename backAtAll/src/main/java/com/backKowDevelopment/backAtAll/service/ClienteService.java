@@ -96,4 +96,20 @@ public class ClienteService {
         db.collection("clientes").document(id).update(updates).get();
     }
 
+    public Cliente getClienteByDocumentoIdentidad(String documentoIdentidad) throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+        Query query = db.collection(COLLECTION_NAME).whereEqualTo("documentoIdentidad", documentoIdentidad);
+        ApiFuture<QuerySnapshot> future = query.get();
+        QuerySnapshot querySnapshot = future.get();
+        List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
+        if (!documents.isEmpty()) {
+            DocumentSnapshot document = documents.get(0);
+            Cliente cliente = document.toObject(Cliente.class);
+            cliente.setId(document.getId());
+            return cliente;
+        } else {
+            return null;
+        }
+    }
+
 }
