@@ -96,7 +96,7 @@ public class ClienteService {
         db.collection("clientes").document(id).update(updates).get();
     }
 
-    public Cliente getClienteByDocumentoIdentidad(String documentoIdentidad) throws ExecutionException, InterruptedException {
+    public Cliente getClienteByDocumentoIdentidad(String documento) throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
         Query query = db.collection(COLLECTION_NAME).whereEqualTo("documentoIdentidad", documentoIdentidad);
         ApiFuture<QuerySnapshot> future = query.get();
